@@ -1,10 +1,67 @@
+/* --- General Layout & Body --- */
 * { box-sizing: border-box; }
-html, body { margin: 0; padding: 0; height: 100%; width: 100%; overflow: hidden; font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif; background-color: #f0f2f5; display: flex; align-items: center; justify-content: center; }
+html, body { margin: 0; padding: 0; height: 100%; width: 100%; overflow: hidden; font-family: system-ui, sans-serif; background-color: #f0f2f5; display: flex; align-items: center; justify-content: center; }
+
+/* --- Sign-In & User Button --- */
 #sign-in-container { width: 100%; max-width: 400px; padding: 2rem; background-color: white; border-radius: 8px; box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1); }
-#app-content, #iframe-container { width: 100%; height: 100%; }
-#iframe-container { display: flex; align-items: center; justify-content: center; }
-iframe { border: 0; width: 100%; height: 100%; }
 #user-button { position: absolute; top: 15px; right: 15px; z-index: 1000; }
+
+/* --- Main App Layout (NEW) --- */
+#app-content {
+    width: 100%;
+    height: 100%;
+    display: grid;
+    grid-template-columns: 280px 1fr; /* Sidebar and main content */
+    grid-template-rows: 100%;
+    gap: 0;
+}
+
+/* --- Quick Actions Panel (NEW) --- */
+#actions-panel {
+    background-color: #ffffff;
+    padding: 2rem 1.5rem;
+    border-right: 1px solid #e0e0e0;
+    display: flex;
+    flex-direction: column;
+    gap: 1rem;
+}
+.panel-title {
+    font-size: 1.2rem;
+    margin: 0 0 1rem 0;
+    color: #333;
+}
+.action-btn {
+    width: 100%;
+    padding: 12px;
+    font-size: 0.9rem;
+    font-weight: 500;
+    text-align: left;
+    background-color: #f4f4f9;
+    border: 1px solid #e0e0e0;
+    border-radius: 6px;
+    cursor: pointer;
+    transition: background-color 0.2s ease;
+}
+.action-btn:hover {
+    background-color: #e9e9f3;
+}
+
+/* --- Iframe & Loading --- */
+#iframe-container { width: 100%; height: 100%; display: flex; align-items: center; justify-content: center; }
+iframe { border: 0; width: 100%; height: 100%; }
 #loading-spinner { border: 5px solid #f3f3f3; border-top: 5px solid #685FFF; border-radius: 50%; width: 50px; height: 50px; animation: spin 1s linear infinite; }
 @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
 #error-container { display: none; text-align: center; color: #d32f2f; }
+
+/* --- Responsive Adjustments --- */
+@media (max-width: 768px) {
+    #app-content {
+        grid-template-columns: 1fr; /* Stack panel on top */
+        grid-template-rows: auto 1fr; /* Panel gets auto height */
+    }
+    #actions-panel {
+        border-right: none;
+        border-bottom: 1px solid #e0e0e0;
+        padding: 1rem;
+    }
+}
