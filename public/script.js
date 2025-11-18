@@ -68,3 +68,27 @@ async function onClerkLoaded() {
 }
 
 document.addEventListener('DOMContentLoaded', initializeClerk);
+
+// ... (keep all the existing code from initializeClerk and onClerkLoaded)
+
+// THIS IS THE NEW PART TO ADD INSIDE onClerkLoaded, after Clerk listeners are set up.
+
+    // --- Quick Actions Logic ---
+    const actionButtons = document.querySelectorAll('.action-btn');
+    actionButtons.forEach(button => {
+        button.addEventListener('click', () => {
+            const prompt = button.getAttribute('data-prompt');
+            if (prompt) {
+                // Copy the prompt to the clipboard
+                navigator.clipboard.writeText(prompt).then(() => {
+                    // Notify the user
+                    alert('Prompt copied to clipboard! Please paste it into the chat.');
+                }).catch(err => {
+                    console.error('Failed to copy prompt: ', err);
+                    alert('Could not copy prompt. Please copy it manually.');
+                });
+            }
+        });
+    });
+
+// ... (keep the rest of the existing code)
