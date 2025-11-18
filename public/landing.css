@@ -1,9 +1,152 @@
-* { box-sizing: border-box; }
-html, body { margin: 0; padding: 0; height: 100%; width: 100%; font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif; background-color: #f0f2f5; color: #333; text-align: center; }
-.container { display: flex; align-items: center; justify-content: center; height: 100%; padding: 1rem; }
-.hero { max-width: 600px; }
-.hero-title { font-size: 3rem; font-weight: 700; margin-bottom: 1rem; color: #111; }
-.hero-subtitle { font-size: 1.2rem; line-height: 1.6; margin-bottom: 2rem; color: #555; }
-.cta-button { display: inline-block; padding: 15px 30px; font-size: 1.1rem; font-weight: 600; color: white; background-color: #685FFF; border-radius: 50px; text-decoration: none; transition: background-color 0.2s ease, transform 0.2s ease; }
-.cta-button:hover { background-color: #5a50e0; transform: translateY(-2px); }
-@media (max-width: 600px) { .hero-title { font-size: 2.5rem; } .hero-subtitle { font-size: 1rem; } }
+/* --- General Layout & Body --- */
+* {
+    box-sizing: border-box;
+}
+
+html, body {
+    margin: 0;
+    padding: 0;
+    width: 100%;
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+    background-color: #f0f2f5;
+    color: #333;
+    text-align: center;
+    scroll-behavior: smooth;
+}
+
+/* --- Helper Classes --- */
+.container {
+    max-width: 1100px;
+    margin: 0 auto;
+    padding: 0 1rem;
+}
+
+.section-title {
+    font-size: 2.5rem;
+    margin-bottom: 3rem;
+    color: #111;
+}
+
+/* --- Hero Section --- */
+.hero {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    height: 100vh; /* Full viewport height */
+    padding: 1rem;
+}
+
+.hero-title {
+    font-size: 3.5rem;
+    font-weight: 700;
+    margin-bottom: 1rem;
+}
+
+.hero-subtitle {
+    font-size: 1.2rem;
+    line-height: 1.6;
+    margin-bottom: 2.5rem;
+    max-width: 600px;
+    margin-left: auto;
+    margin-right: auto;
+}
+
+.cta-button {
+    display: inline-block;
+    padding: 15px 35px;
+    font-size: 1.1rem;
+    font-weight: 600;
+    color: white;
+    background-color: #685FFF;
+    border-radius: 50px;
+    text-decoration: none;
+    transition: background-color 0.2s ease, transform 0.2s ease;
+}
+
+.cta-button:hover {
+    background-color: #5a50e0;
+    transform: translateY(-3px);
+}
+
+/* --- Benefits Section --- */
+.benefits {
+    padding: 5rem 0;
+    background-color: #ffffff;
+}
+
+.benefits-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+    gap: 2rem;
+}
+
+.benefit-card {
+    padding: 2rem;
+}
+
+.benefit-icon {
+    width: 50px;
+    height: 50px;
+    color: #685FFF;
+    margin-bottom: 1.5rem;
+}
+
+.benefit-card h3 {
+    font-size: 1.5rem;
+    margin-bottom: 1rem;
+}
+
+.benefit-card p {
+    line-height: 1.6;
+    color: #555;
+}
+
+/* --- Team Section --- */
+.team {
+    padding: 5rem 0;
+}
+
+.team-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+    gap: 2rem;
+}
+
+.team-member .team-photo {
+    width: 120px;
+    height: 120px;
+    border-radius: 50%;
+    background-color: #ddd; /* Placeholder for photo */
+    margin: 0 auto 1.5rem auto;
+    border: 4px solid #fff;
+    box-shadow: 0 4px 10px rgba(0,0,0,0.1);
+}
+
+.team-member h3 {
+    font-size: 1.4rem;
+    margin-bottom: 0.5rem;
+}
+
+.team-member .team-role {
+    color: #777;
+}
+
+/* --- Footer --- */
+.footer {
+    padding: 2rem 0;
+    background-color: #ffffff;
+    border-top: 1px solid #e0e0e0;
+    font-size: 0.9rem;
+    color: #888;
+}
+
+/* --- Responsive Design --- */
+@media (max-width: 768px) {
+    .hero-title {
+        font-size: 2.8rem;
+    }
+    .section-title {
+        font-size: 2rem;
+    }
+}
+
