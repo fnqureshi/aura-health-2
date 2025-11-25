@@ -7,29 +7,78 @@
     <link rel="stylesheet" href="style.css">
 </head>
 <body>
+    <!-- Clerk user button for sign-out -->
     <div id="user-button"></div>
+    
+    <!-- Container for the Clerk sign-in form -->
     <div id="sign-in-container"></div>
 
-    <!-- Main app container, now using a grid layout -->
+    <!-- Mobile menu toggle button -->
+    <button id="menu-toggle-btn">
+        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16" />
+        </svg>
+    </button>
+
+    <!-- Main application container, hidden until login -->
     <div id="app-content" style="display: none;">
         
-        <!-- New Quick Actions Panel -->
+        <!-- Panel 1: Quick Actions (for mobile off-canvas menu) -->
         <div id="actions-panel">
-            <h3 class="panel-title">Quick Actions</h3>
+            <div class="panel-header">
+                <h3 class="panel-title">Quick Actions</h3>
+                <button id="close-panel-btn">&times;</button>
+            </div>
             <button class="action-btn" data-prompt="Start a new journal entry for today's date. Ask me about my pain level, symptoms, and any other notes.">Log Today's Entry</button>
             <button class="action-btn" data-prompt="Analyze my entries from the last 7 days and generate a clinical summary. Include my average pain score, most frequent symptoms, and any patterns you detect.">Generate Weekly Summary</button>
             <button class="action-btn" data-prompt="Generate a comprehensive 'Doctor-Ready Report' based on all my data. The report should include a summary, a pain chart, and a detailed log. Structure it for a medical professional to review quickly.">Prepare Doctor's Report</button>
         </div>
 
-        <!-- Iframe container for the agent -->
+        <!-- Panel 2: The Scribe's Log for tracking -->
+        <div id="tracker-panel">
+            <div class="panel-header">
+                <h3 class="panel-title">Scribe's Log</h3>
+            </div>
+            <div id="tracker-form">
+                <label for="pain-level">Pain Level (0-10)</label>
+                <input type="range" id="pain-level" min="0" max="10" value="5">
+                
+                <label>Symptoms</label>
+                <div id="symptom-tags">
+                    <button class="symptom-tag" data-symptom="Pelvic Pain">Pelvic Pain</button>
+                    <button class="symptom-tag" data-symptom="Bloating">Bloating</button>
+                    <button class="symptom-tag" data-symptom="Fatigue">Fatigue</button>
+                    <button class="symptom-tag" data-symptom="Nausea">Nausea</button>
+                    <button class="symptom-tag" data-symptom="Back Pain">Back Pain</button>
+                </div>
+
+                <label for="notes">Notes for Today</label>
+                <textarea id="notes" rows="3" placeholder="e.g., Pain was worse after eating..."></textarea>
+                
+                <button id="add-entry-btn">Add Today's Entry</button>
+            </div>
+            <hr>
+            <div id="log-history-wrapper">
+                <h4>Your Log History</h4>
+                <div id="log-history">
+                    <p>Your entries will appear here.</p>
+                </div>
+                <button id="copy-log-btn">Copy Log for AI</button>
+            </div>
+        </div>
+
+        <!-- Panel 3: The AI Agent Iframe -->
         <div id="iframe-container">
             <div id="loading-spinner"></div>
             <div id="error-container"></div>
         </div>
-
     </div>
     
+    <!-- Overlay for the mobile menu -->
+    <div id="overlay"></div>
+
     <script src="script.js"></script>
 </body>
 </html>
+
 
