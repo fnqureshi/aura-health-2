@@ -4,8 +4,7 @@ async function initializeClerk() {
         if (!response.ok) throw new Error('Could not fetch Clerk configuration.');
         const data = await response.json();
         const CLERK_PUBLISHABLE_KEY = data.key;
-        if (!CLERK_PUBLISHABLE_KEY) throw new Error("Missing Clerk Publishable Key from server.");
-
+        
         const clerkScript = document.createElement('script');
         clerkScript.setAttribute('data-clerk-publishable-key', CLERK_PUBLISHABLE_KEY);
         clerkScript.async = true;
@@ -15,189 +14,162 @@ async function initializeClerk() {
         document.head.appendChild(clerkScript);
     } catch (error) {
         console.error("Failed to initialize Clerk:", error);
-        document.body.innerHTML = '<p style="color: red; text-align: center;">Error: Application could not be initialized.</p>';
     }
 }
 
 async function onClerkLoaded() {
     await window.Clerk.load();
 
-    // --- Element Selectors ---
+    // UI Elements
     const userButtonDiv = document.getElementById('user-button');
     const appContent = document.getElementById('app-content');
     const signInContainer = document.getElementById('sign-in-container');
-    const iframeContainer = document.getElementById('iframe-container');
-    const loadingSpinner = document.getElementById('loading-spinner');
-    const errorContainer = document.getElementById('error-container');
     
-    const menuToggleBtn = document.getElementById('menu-toggle-btn');
-    const closePanelBtn = document.getElementById('close-panel-btn');
-    const actionsPanel = document.getElementById('actions-panel');
-    const overlay = document.getElementById('overlay');
+    // Chat Elements
+    const chatMessages = document.getElementById('chat-messages');
+    const userInput = document.getElementById('user-input');
+    const sendBtn = document.getElementById('send-btn');
 
+    // Tracker Elements
     const painLevelSlider = document.getElementById('pain-level');
     const symptomTagsContainer = document.getElementById('symptom-tags');
     const notesTextarea = document.getElementById('notes');
     const addEntryBtn = document.getElementById('add-entry-btn');
     const logHistoryContainer = document.getElementById('log-history');
-    const copyLogBtn = document.getElementById('copy-log-btn');
 
+    // State
     const LOG_STORAGE_KEY = 'auraScribeLog';
     let logEntries = [];
+    let chatHistory = []; // Stores conversation for Gemini context
 
-    // --- Tracker Logic ---
-    function saveEntries() {
-        localStorage.setItem(LOG_STORAGE_KEY, JSON.stringify(logEntries));
-    }
-
+    // --- Tracker Functions ---
     function loadEntries() {
-        const storedEntries = localStorage.getItem(LOG_STORAGE_KEY);
-        logEntries = storedEntries ? JSON.parse(storedEntries) : [];
+        const stored = localStorage.getItem(LOG_STORAGE_KEY);
+        logEntries = stored ? JSON.parse(stored) : [];
+        renderLog();
     }
 
     function renderLog() {
         logHistoryContainer.innerHTML = '';
         if (logEntries.length === 0) {
-            logHistoryContainer.innerHTML = '<p>Your daily entries will appear here.</p>';
+            logHistoryContainer.innerHTML = '<p class="empty-state">No entries yet.</p>';
             return;
         }
         logEntries.forEach(entry => {
-            const entryDiv = document.createElement('div');
-            entryDiv.className = 'log-entry';
-            entryDiv.innerHTML = `
-                <strong>${entry.date}</strong><br>
-                Pain: ${entry.pain}/10<br>
-                Symptoms: ${entry.symptoms.join(', ') || 'None'}<br>
-                Notes: ${entry.notes || 'N/A'}
-            `;
-            logHistoryContainer.prepend(entryDiv); // Show newest first
+            const div = document.createElement('div');
+            div.className = 'log-entry';
+            div.innerHTML = `<strong>${entry.date}</strong> - Pain: ${entry.pain}/10<br><small>${entry.symptoms.join(', ')}</small>`;
+            logHistoryContainer.prepend(div);
         });
     }
 
     function addEntry() {
-        const selectedSymptoms = Array.from(symptomTagsContainer.querySelectorAll('.symptom-tag.selected'))
-            .map(tag => tag.dataset.symptom);
-
-        const newEntry = {
+        const symptoms = Array.from(symptomTagsContainer.querySelectorAll('.selected')).map(t => t.dataset.symptom);
+        const entry = {
             date: new Date().toLocaleDateString(),
             pain: painLevelSlider.value,
-            symptoms: selectedSymptoms,
+            symptoms,
             notes: notesTextarea.value.trim()
         };
-
-        logEntries.push(newEntry);
-        saveEntries();
+        logEntries.push(entry);
+        localStorage.setItem(LOG_STORAGE_KEY, JSON.stringify(logEntries));
         renderLog();
         
-        // Reset form for next entry
+        // Reset UI
         notesTextarea.value = '';
-        symptomTagsContainer.querySelectorAll('.selected').forEach(tag => tag.classList.remove('selected'));
+        symptomTagsContainer.querySelectorAll('.selected').forEach(t => t.classList.remove('selected'));
         painLevelSlider.value = 5;
     }
 
-    function copyLogForAI() {
-        if (logEntries.length === 0) {
-            alert("No log entries to copy.");
-            return;
-        }
-        const formattedLog = logEntries.map(entry => {
-            return `
-Date: ${entry.date}
-- Pain Level: ${entry.pain}/10
-- Symptoms: ${entry.symptoms.join(', ') || 'None'}
-- Notes: ${entry.notes || 'N/A'}
-            `.trim();
-        }).join('\n\n---\n\n');
-
-        const fullPrompt = `Please analyze the following medical log entries for patterns related to endometriosis. Summarize the key findings in a clinical format suitable for a doctor, highlighting trends in pain and symptoms.\n\n--- LOG DATA ---\n\n${formattedLog}`;
-
-        navigator.clipboard.writeText(fullPrompt).then(() => {
-            alert('Log and analysis prompt copied to clipboard! Please paste it into the AI chat.');
-        });
+    // --- Chat Functions ---
+    function appendMessage(text, isUser) {
+        const div = document.createElement('div');
+        div.className = `message ${isUser ? 'user-message' : 'ai-message'}`;
+        // Use 'marked' library to parse Markdown from AI
+        div.innerHTML = isUser ? text : marked.parse(text);
+        chatMessages.appendChild(div);
+        chatMessages.scrollTop = chatMessages.scrollHeight;
     }
 
-    // --- Clerk Authentication Logic ---
+    async function sendMessage() {
+        const text = userInput.value.trim();
+        if (!text) return;
+
+        appendMessage(text, true);
+        userInput.value = '';
+
+        // Prepare context from logs (last 5 entries)
+        const recentLogs = logEntries.slice(-5).map(e => 
+            `Date: ${e.date}, Pain: ${e.pain}/10, Symptoms: ${e.symptoms.join(', ')}, Notes: ${e.notes}`
+        ).join('\n');
+
+        try {
+            const response = await fetch('/api/chat', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({
+                    message: text,
+                    history: chatHistory,
+                    context: recentLogs // Sending logs to AI!
+                })
+            });
+
+            const data = await response.json();
+            if (data.response) {
+                appendMessage(data.response, false);
+                // Update history
+                chatHistory.push({ role: "user", parts: [{ text }] });
+                chatHistory.push({ role: "model", parts: [{ text: data.response }] });
+            }
+        } catch (error) {
+            console.error(error);
+            appendMessage("Error: Could not connect to Aura Scribe.", false);
+        }
+    }
+
+    // --- Event Listeners ---
+    sendBtn.addEventListener('click', sendMessage);
+    userInput.addEventListener('keypress', (e) => { if(e.key === 'Enter' && !e.shiftKey) { e.preventDefault(); sendMessage(); } });
+    
+    addEntryBtn.addEventListener('click', addEntry);
+    symptomTagsContainer.addEventListener('click', (e) => {
+        if (e.target.classList.contains('symptom-tag')) e.target.classList.toggle('selected');
+    });
+
+    // Quick Actions
+    document.querySelectorAll('.action-btn').forEach(btn => {
+        btn.addEventListener('click', () => {
+            userInput.value = btn.dataset.prompt;
+            sendMessage(); // Auto-send for quick actions
+            // Close mobile menu if open
+            document.getElementById('actions-panel').classList.remove('is-open');
+            document.getElementById('overlay').classList.remove('is-visible');
+        });
+    });
+
+    // Mobile Menu
+    document.getElementById('menu-toggle-btn').addEventListener('click', () => {
+        document.getElementById('actions-panel').classList.add('is-open');
+        document.getElementById('overlay').classList.add('is-visible');
+    });
+    document.getElementById('close-panel-btn').addEventListener('click', () => {
+        document.getElementById('actions-panel').classList.remove('is-open');
+        document.getElementById('overlay').classList.remove('is-visible');
+    });
+
+    // --- Clerk Init ---
     window.Clerk.mountUserButton(userButtonDiv);
     window.Clerk.addListener(({ user }) => {
         if (user) {
             signInContainer.style.display = 'none';
-            appContent.style.display = 'block';
-            loadEmbed(user.id);
+            appContent.style.display = 'flex'; // Flex for layout
             loadEntries();
-            renderLog();
         } else {
             appContent.style.display = 'none';
             signInContainer.style.display = 'block';
             window.Clerk.mountSignIn(signInContainer);
         }
     });
-
-    // --- Mobile Menu Toggle Logic ---
-    function openMenu() {
-        actionsPanel.classList.add('is-open');
-        overlay.classList.add('is-visible');
-    }
-
-    function closeMenu() {
-        actionsPanel.classList.remove('is-open');
-        overlay.classList.remove('is-visible');
-    }
-
-    menuToggleBtn.addEventListener('click', openMenu);
-    closePanelBtn.addEventListener('click', closeMenu);
-    overlay.addEventListener('click', closeMenu);
-
-    // --- Quick Actions Logic ---
-    const actionButtons = document.querySelectorAll('.action-btn');
-    actionButtons.forEach(button => {
-        button.addEventListener('click', () => {
-            const prompt = button.getAttribute('data-prompt');
-            if (prompt) {
-                navigator.clipboard.writeText(prompt).then(() => {
-                    alert('Prompt copied to clipboard! Please paste it into the chat.');
-                    if (window.innerWidth < 769) {
-                        closeMenu();
-                    }
-                });
-            }
-        });
-    });
-    
-    // --- Tracker Event Listeners ---
-    symptomTagsContainer.addEventListener('click', (e) => {
-        if (e.target.classList.contains('symptom-tag')) {
-            e.target.classList.toggle('selected');
-        }
-    });
-    addEntryBtn.addEventListener('click', addEntry);
-    copyLogBtn.addEventListener('click', copyLogForAI);
-
-    // --- Iframe Loading Logic ---
-    async function loadEmbed(userId) {
-        loadingSpinner.style.display = 'block';
-        errorContainer.style.display = 'none';
-        iframeContainer.innerHTML = '';
-        try {
-            const response = await fetch('/api/embed-url');
-            if (!response.ok) throw new Error(`Server responded with status: ${response.status}`);
-            const data = await response.json();
-            if (data.url) {
-                const personalizedUrl = `${data.url}&conversation_id=${userId}`;
-                const iframe = document.createElement('iframe');
-iframe.src = personalizedUrl;
-                loadingSpinner.style.display = 'none';
-                iframeContainer.appendChild(iframe);
-            } else {
-                throw new Error('Embed URL was not provided by the server.');
-            }
-        } catch (error) {
-            console.error('Error:', error);
-            loadingSpinner.style.display = 'none';
-            errorContainer.style.display = 'block';
-            errorContainer.innerHTML = `<p>Error: Could not load the conversation.</p>`;
-        }
-    }
 }
 
 document.addEventListener('DOMContentLoaded', initializeClerk);
-
