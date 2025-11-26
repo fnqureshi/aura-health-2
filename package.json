@@ -3,6 +3,9 @@
   "version": "1.0.0",
   "description": "Aura Health - The Sovereign's Armory",
   "main": "server.js",
+  "engines": {
+    "node": "18.x"
+  },
   "scripts": {
     "start": "node server.js"
   },
