@@ -3,82 +3,81 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Aura Scribe App</title>
+    <title>Aura Scribe | Endometriosis Advocate</title>
     <link rel="stylesheet" href="style.css">
+    <!-- Markdown parser for pretty AI responses -->
+    <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
 </head>
 <body>
-    <!-- Clerk user button for sign-out -->
     <div id="user-button"></div>
-    
-    <!-- Container for the Clerk sign-in form -->
     <div id="sign-in-container"></div>
-
-    <!-- Mobile menu toggle button -->
     <button id="menu-toggle-btn">
-        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16" />
-        </svg>
+        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16" /></svg>
     </button>
 
-    <!-- Main application container, hidden until login -->
     <div id="app-content" style="display: none;">
         
-        <!-- Panel 1: Quick Actions (for mobile off-canvas menu) -->
+        <!-- Panel 1: Quick Actions -->
         <div id="actions-panel">
             <div class="panel-header">
-                <h3 class="panel-title">Quick Actions</h3>
+                <h3 class="panel-title">Clinical Tools</h3>
                 <button id="close-panel-btn">&times;</button>
             </div>
-            <button class="action-btn" data-prompt="Start a new journal entry for today's date. Ask me about my pain level, symptoms, and any other notes.">Log Today's Entry</button>
-            <button class="action-btn" data-prompt="Analyze my entries from the last 7 days and generate a clinical summary. Include my average pain score, most frequent symptoms, and any patterns you detect.">Generate Weekly Summary</button>
-            <button class="action-btn" data-prompt="Generate a comprehensive 'Doctor-Ready Report' based on all my data. The report should include a summary, a pain chart, and a detailed log. Structure it for a medical professional to review quickly.">Prepare Doctor's Report</button>
+            <button class="action-btn" data-prompt="Based on my logs, generate a 'Doctor-Ready' clinical summary for my next appointment.">📄 Generate Clinical Report</button>
+            <button class="action-btn" data-prompt="Analyze my recent symptoms for patterns related to my cycle.">📊 Analyze Symptom Patterns</button>
+            <button class="action-btn" data-prompt="What specific medical terminology should I use to describe my current pain to a specialist?">🗣️ Vocabulary Coach</button>
         </div>
 
-        <!-- Panel 2: The Scribe's Log for tracking -->
+        <!-- Panel 2: Scribe's Log -->
         <div id="tracker-panel">
-            <div class="panel-header">
-                <h3 class="panel-title">Scribe's Log</h3>
-            </div>
+            <div class="panel-header"><h3 class="panel-title">Symptom Log</h3></div>
             <div id="tracker-form">
-                <label for="pain-level">Pain Level (0-10)</label>
+                <label>Pain Severity (0-10)</label>
                 <input type="range" id="pain-level" min="0" max="10" value="5">
+                <div class="pain-labels"><span>Mild</span><span>Severe</span></div>
                 
-                <label>Symptoms</label>
+                <label>Key Symptoms</label>
                 <div id="symptom-tags">
-                    <button class="symptom-tag" data-symptom="Pelvic Pain">Pelvic Pain</button>
-                    <button class="symptom-tag" data-symptom="Bloating">Bloating</button>
+                    <button class="symptom-tag" data-symptom="Dysmenorrhea">Cramps</button>
+                    <button class="symptom-tag" data-symptom="Bloating">Endo Belly</button>
                     <button class="symptom-tag" data-symptom="Fatigue">Fatigue</button>
                     <button class="symptom-tag" data-symptom="Nausea">Nausea</button>
-                    <button class="symptom-tag" data-symptom="Back Pain">Back Pain</button>
+                    <button class="symptom-tag" data-symptom="Sciatica">Leg Pain</button>
+                    <button class="symptom-tag" data-symptom="Dyspareunia">Painful Sex</button>
                 </div>
 
-                <label for="notes">Notes for Today</label>
-                <textarea id="notes" rows="3" placeholder="e.g., Pain was worse after eating..."></textarea>
-                
-                <button id="add-entry-btn">Add Today's Entry</button>
+                <label>Clinical Notes</label>
+                <textarea id="notes" rows="2" placeholder="Triggers, medication taken, impact on work..."></textarea>
+                <button id="add-entry-btn">Log Entry</button>
             </div>
             <hr>
             <div id="log-history-wrapper">
-                <h4>Your Log History</h4>
-                <div id="log-history">
-                    <p>Your entries will appear here.</p>
-                </div>
-                <button id="copy-log-btn">Copy Log for AI</button>
+                <h4>Recent History</h4>
+                <div id="log-history"><p class="empty-state">No entries yet.</p></div>
             </div>
         </div>
 
-        <!-- Panel 3: The AI Agent Iframe -->
-        <div id="iframe-container">
-            <div id="loading-spinner"></div>
-            <div id="error-container"></div>
+        <!-- Panel 3: Custom Chat Interface (Replaces Iframe) -->
+        <div id="chat-container">
+            <div id="chat-header">
+                <h3>Aura Clinical Advocate</h3>
+                <span class="status-badge">Powered by Gemini 1.5</span>
+            </div>
+            <div id="chat-messages">
+                <div class="message ai-message">
+                    Hello. I am your Aura Scribe. I have access to your symptom logs. How can I help you prepare for your medical care today?
+                </div>
+            </div>
+            <div id="chat-input-area">
+                <textarea id="user-input" placeholder="Describe your situation or ask for a report..." rows="1"></textarea>
+                <button id="send-btn">
+                    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 19l9 2-9-18-9 18 9-2zm0 0v-8" /></svg>
+                </button>
+            </div>
         </div>
     </div>
     
-    <!-- Overlay for the mobile menu -->
     <div id="overlay"></div>
-
     <script src="script.js"></script>
 </body>
 </html>
-
-
