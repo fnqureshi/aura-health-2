@@ -1,286 +1,72 @@
-/* --- General Layout & Body --- */
-* { 
-    box-sizing: border-box; 
-}
-html, body { 
-    margin: 0; 
-    padding: 0; 
-    height: 100%; 
-    width: 100%; 
-    overflow: hidden; 
-    font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif; 
-    background-color: #f0f2f5; 
-}
 
-/* --- Sign-In & User Button --- */
-#sign-in-container { 
-    width: 100%; 
-    max-width: 400px; 
-    padding: 2rem; 
-    margin: auto; 
-    background-color: white; 
-    border-radius: 8px; 
-    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1); 
-}
-#user-button { 
-    position: absolute; 
-    top: 15px; 
-    right: 15px; 
-    z-index: 1000; 
-}
+/* --- General Layout --- */
+* { box-sizing: border-box; }
+html, body { margin: 0; padding: 0; height: 100%; width: 100%; overflow: hidden; font-family: system-ui, -apple-system, sans-serif; background-color: #f0f2f5; }
 
-/* --- Main App Layout (Mobile First) --- */
-#app-content { 
-    width: 100%; 
-    height: 100%; 
-    display: flex; 
-}
+/* --- Sign In --- */
+#sign-in-container { width: 100%; max-width: 400px; padding: 2rem; margin: auto; background-color: white; border-radius: 8px; box-shadow: 0 4px 12px rgba(0,0,0,0.1); }
+#user-button { position: absolute; top: 15px; right: 15px; z-index: 1000; }
 
-/* --- Off-Canvas Actions Panel (Mobile View) --- */
-#actions-panel {
-    position: fixed;
-    top: 0;
-    left: 0;
-    height: 100%;
-    width: 280px;
-    background-color: #ffffff;
-    box-shadow: 4px 0 15px rgba(0,0,0,0.1);
-    padding: 1.5rem;
-    transform: translateX(-100%); /* Hidden by default */
-    transition: transform 0.3s ease-in-out;
-    z-index: 2000;
-}
-#actions-panel.is-open {
-    transform: translateX(0); /* Visible when class is added */
-}
-.panel-header { 
-    display: flex; 
-    justify-content: space-between; 
-    align-items: center; 
-    margin-bottom: 1.5rem; 
-}
-.panel-title { 
-    font-size: 1.2rem; 
-    margin: 0; 
-    color: #333; 
-}
-#close-panel-btn { 
-    font-size: 2rem; 
-    background: none; 
-    border: none; 
-    cursor: pointer; 
-    color: #888; 
-}
-.action-btn { 
-    width: 100%; 
-    padding: 12px; 
-    margin-bottom: 1rem; 
-    font-size: 0.9rem; 
-    text-align: left; 
-    background-color: #f4f4f9; 
-    border: 1px solid #e0e0e0; 
-    border-radius: 6px; 
-    cursor: pointer; 
-    transition: background-color 0.2s ease; 
-}
-.action-btn:hover { 
-    background-color: #e9e9f3; 
-}
+/* --- Layout Grid --- */
+#app-content { width: 100%; height: 100%; display: flex; }
 
-/* --- Menu Toggle Button (Mobile View) --- */
-#menu-toggle-btn {
-    position: fixed;
-    top: 15px;
-    left: 15px;
-    width: 40px;
-    height: 40px;
-    background-color: white;
-    border: 1px solid #ddd;
-    border-radius: 50%;
-    cursor: pointer;
-    z-index: 1000;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    box-shadow: 0 2px 5px rgba(0,0,0,0.1);
-}
-#menu-toggle-btn svg { 
-    width: 24px; 
-    height: 24px; 
-    color: #333; 
-}
+/* --- Mobile Menu & Actions --- */
+#menu-toggle-btn { position: fixed; top: 15px; left: 15px; width: 40px; height: 40px; background: white; border: 1px solid #ddd; border-radius: 50%; z-index: 1000; display: flex; align-items: center; justify-content: center; cursor: pointer; }
+#menu-toggle-btn svg { width: 24px; height: 24px; }
+#actions-panel { position: fixed; top: 0; left: 0; height: 100%; width: 280px; background: white; z-index: 2000; transform: translateX(-100%); transition: transform 0.3s; padding: 1.5rem; border-right: 1px solid #eee; }
+#actions-panel.is-open { transform: translateX(0); }
+.panel-header { display: flex; justify-content: space-between; margin-bottom: 1.5rem; }
+.panel-title { font-size: 1.1rem; font-weight: 700; color: #333; margin: 0; }
+.action-btn { width: 100%; padding: 12px; margin-bottom: 0.8rem; text-align: left; background: #f8f9fa; border: 1px solid #e9ecef; border-radius: 8px; cursor: pointer; font-size: 0.9rem; transition: all 0.2s; }
+.action-btn:hover { background: #e2e6ea; border-color: #ced4da; }
+#close-panel-btn { background: none; border: none; font-size: 1.5rem; cursor: pointer; color: #666; }
+#overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.4); z-index: 1999; display: none; }
+#overlay.is-visible { display: block; }
 
-/* --- Overlay (Mobile View) --- */
-#overlay {
-    position: fixed;
-    top: 0;
-    left: 0;
-    width: 100%;
-    height: 100%;
-    background-color: rgba(0, 0, 0, 0.4);
-    z-index: 1999;
-    opacity: 0;
-    visibility: hidden;
-    transition: opacity 0.3s ease-in-out, visibility 0.3s ease-in-out;
-}
-#overlay.is-visible {
-    opacity: 1;
-    visibility: visible;
-}
+/* --- Tracker Panel --- */
+#tracker-panel { background: #fdfdff; padding: 1.5rem; border-right: 1px solid #e0e0e0; display: none; flex-direction: column; overflow-y: auto; }
+#tracker-form label { font-weight: 600; font-size: 0.85rem; text-transform: uppercase; color: #666; margin-bottom: 0.5rem; display: block; }
+.pain-labels { display: flex; justify-content: space-between; font-size: 0.8rem; color: #888; margin-bottom: 1rem; }
+#symptom-tags { display: flex; flex-wrap: wrap; gap: 0.5rem; margin-bottom: 1.5rem; }
+.symptom-tag { background: white; border: 1px solid #ddd; border-radius: 20px; padding: 6px 12px; cursor: pointer; font-size: 0.85rem; }
+.symptom-tag.selected { background: #685FFF; color: white; border-color: #685FFF; }
+#tracker-form textarea { width: 100%; border: 1px solid #ccc; border-radius: 6px; padding: 8px; margin-bottom: 1rem; resize: none; font-family: inherit; }
+#add-entry-btn { width: 100%; padding: 10px; background: #685FFF; color: white; border: none; border-radius: 6px; font-weight: 600; cursor: pointer; }
+#log-history { margin-top: 1rem; flex-grow: 1; overflow-y: auto; }
+.log-entry { background: white; border: 1px solid #eee; padding: 10px; border-radius: 6px; margin-bottom: 10px; font-size: 0.9rem; }
+.empty-state { color: #999; font-style: italic; text-align: center; margin-top: 20px; }
 
-/* --- Tracker Panel Styles --- */
-#tracker-panel {
-    background-color: #fdfdff;
-    padding: 1.5rem;
-    border-right: 1px solid #e0e0e0;
-    display: none; /* Hidden on mobile by default */
-    flex-direction: column;
-    overflow-y: auto;
-}
-#tracker-form label { 
-    font-weight: 600; 
-    font-size: 0.9rem; 
-    margin-bottom: 0.5rem; 
-    display: block; 
-}
-#tracker-form input[type="range"] { 
-    width: 100%; 
-    margin-bottom: 1rem; 
-}
-#symptom-tags { 
-    display: flex; 
-    flex-wrap: wrap; 
-    gap: 0.5rem; 
-    margin-bottom: 1rem; 
-}
-.symptom-tag { 
-    background-color: #eef; 
-    border: 1px solid #ccd; 
-    border-radius: 15px; 
-    padding: 5px 12px; 
-    cursor: pointer; 
-    font-size: 0.8rem; 
-}
-.symptom-tag.selected { 
-    background-color: #685FFF; 
-    color: white; 
-    border-color: #685FFF; 
-}
-#tracker-form textarea { 
-    width: 100%; 
-    border: 1px solid #ccc; 
-    border-radius: 4px; 
-    padding: 8px; 
-    margin-bottom: 1rem; 
-    resize: vertical;
-}
-#add-entry-btn { 
-    width: 100%; 
-    padding: 12px; 
-    background-color: #685FFF; 
-    color: white; 
-    border: none; 
-    border-radius: 6px; 
-    font-weight: 600; 
-    cursor: pointer; 
-}
-#log-history-wrapper { 
-    margin-top: 1rem; 
-    display: flex; 
-    flex-direction: column; 
-    flex-grow: 1; 
-    min-height: 150px;
-}
-#log-history { 
-    background-color: #f4f4f9; 
-    border-radius: 4px; 
-    padding: 1rem; 
-    flex-grow: 1; 
-    overflow-y: auto; 
-}
-.log-entry { 
-    margin-bottom: 1rem; 
-    border-bottom: 1px solid #ddd; 
-    padding-bottom: 1rem; 
-    font-size: 0.9rem; 
-}
-.log-entry:last-child { 
-    border-bottom: none; 
-}
-#copy-log-btn { 
-    margin-top: 1rem; 
-    padding: 10px; 
-    background-color: #333; 
-    color: white; 
-    border: none; 
-    border-radius: 6px; 
-    cursor: pointer; 
-}
+/* --- Chat Interface --- */
+#chat-container { flex-grow: 1; display: flex; flex-direction: column; background: white; position: relative; }
+#chat-header { padding: 15px 20px; border-bottom: 1px solid #eee; display: flex; justify-content: space-between; align-items: center; background: #fff; }
+#chat-header h3 { margin: 0; font-size: 1.1rem; color: #333; }
+.status-badge { font-size: 0.75rem; background: #e6f4ea; color: #1e7e34; padding: 4px 8px; border-radius: 12px; font-weight: 600; }
 
-/* --- Iframe & Loading --- */
-#iframe-container { 
-    width: 100%; 
-    height: 100%; 
-    display: flex; 
-    align-items: center; 
-    justify-content: center; 
-}
-iframe { 
-    border: 0; 
-    width: 100%; 
-    height: 100%; 
-}
-#loading-spinner { 
-    border: 5px solid #f3f3f3; 
-    border-top: 5px solid #685FFF; 
-    border-radius: 50%; 
-    width: 50px; 
-    height: 50px; 
-    animation: spin 1s linear infinite; 
-}
-@keyframes spin { 
-    0% { transform: rotate(0deg); } 
-    100% { transform: rotate(360deg); } 
-}
-#error-container { 
-    display: none; 
-    text-align: center; 
-    color: #d32f2f; 
-}
+#chat-messages { flex-grow: 1; padding: 20px; overflow-y: auto; display: flex; flex-direction: column; gap: 15px; background: #fafafa; }
+.message { max-width: 85%; padding: 12px 16px; border-radius: 12px; line-height: 1.5; font-size: 0.95rem; word-wrap: break-word; }
+.ai-message { align-self: flex-start; background: white; border: 1px solid #e0e0e0; border-bottom-left-radius: 2px; color: #333; }
+.user-message { align-self: flex-end; background: #685FFF; color: white; border-bottom-right-radius: 2px; }
+.message p { margin: 0 0 10px 0; }
+.message p:last-child { margin: 0; }
+.message ul, .message ol { margin: 0 0 10px 0; padding-left: 20px; }
 
-/* --- Desktop Layout Adjustments --- */
+#chat-input-area { padding: 20px; background: white; border-top: 1px solid #eee; display: flex; gap: 10px; align-items: flex-end; }
+#user-input { flex-grow: 1; border: 1px solid #ddd; border-radius: 20px; padding: 12px 15px; font-family: inherit; resize: none; max-height: 100px; outline: none; }
+#user-input:focus { border-color: #685FFF; }
+#send-btn { background: #685FFF; color: white; border: none; width: 45px; height: 45px; border-radius: 50%; cursor: pointer; display: flex; align-items: center; justify-content: center; transition: transform 0.1s; }
+#send-btn:active { transform: scale(0.95); }
+#send-btn svg { width: 20px; height: 20px; }
+
+/* --- Desktop Media Query --- */
 @media (min-width: 1024px) {
-    #app-content {
-        display: grid;
-        grid-template-columns: 280px 320px 1fr; /* Actions, Tracker, Chat */
-    }
-    #actions-panel {
-        position: static;
-        transform: translateX(0);
-        box-shadow: none;
-        border-right: 1px solid #e0e0e0;
-    }
-    #tracker-panel {
-        display: flex;
-    }
-    #menu-toggle-btn, #close-panel-btn, #overlay {
-        display: none;
-    }
+    #app-content { display: grid; grid-template-columns: 260px 300px 1fr; }
+    #actions-panel { position: static; transform: translateX(0); box-shadow: none; }
+    #tracker-panel { display: flex; }
+    #menu-toggle-btn, #close-panel-btn, #overlay { display: none; }
 }
-
-/* --- Tablet Layout Adjustments --- */
 @media (min-width: 769px) and (max-width: 1023px) {
-    #app-content {
-        display: grid;
-        grid-template-columns: 300px 1fr; /* Tracker and Chat */
-    }
-    #actions-panel {
-        position: fixed; /* Keep it as a slide-out menu */
-    }
-    #tracker-panel {
-        display: flex;
-    }
-    #menu-toggle-btn { 
-        display: flex; 
-    }
+    #app-content { display: grid; grid-template-columns: 300px 1fr; }
+    #actions-panel { position: fixed; }
+    #tracker-panel { display: flex; }
+    #menu-toggle-btn { display: flex; }
 }
